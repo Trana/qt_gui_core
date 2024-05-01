@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 project(qt_gui_cpp)
 
+cmake_policy(SET CMP0148 OLD)
+
 # Default to C++17
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 17)
@@ -19,8 +21,17 @@ if(WIN32)
   return()
 endif()
 
+# FindPythonLibs deprecated since 3.12
+# https://cmake.org/cmake/help/latest/module/FindPythonLibs.html
+# Use FindPython to set the cache variables.
+find_package(Python 3 REQUIRED
+  COMPONENTS Interpreter Development
+)
+set(PYTHON_LIBRARY ${Python3_LIBRARY_DIRS})
+set(PYTHON_INCLUDE_DIR ${Python3_INCLUDE_DIRS})
+
 find_package(pluginlib REQUIRED)
-find_package(Qt5 REQUIRED COMPONENTS Widgets)
+find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)
 find_package(tinyxml2_vendor REQUIRED)
 find_package(TinyXML2 REQUIRED)
 

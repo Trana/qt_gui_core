@@ -33,6 +33,7 @@ import os
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import QEvent, QObject, Qt, qWarning
 from python_qt_binding.QtGui import QIcon
+from python_qt_binding.QtGui import QContextMenuEvent
 from python_qt_binding.QtWidgets import QDockWidget, QMenu, QWidget
 
 
@@ -134,7 +135,7 @@ class DockWidgetTitleBar(QWidget):
             ret_val = self._event_callbacks[event.type()](obj, event)
             if ret_val is not None:
                 return ret_val
-        if event.type() == event.ContextMenu and obj == self.title_label:
+        if event.type() == QContextMenuEvent and obj == self.title_label:
             menu = QMenu(self)
             rename_action = menu.addAction(self.tr('Rename dock widget'))
             action = menu.exec_(self.mapToGlobal(event.pos()))

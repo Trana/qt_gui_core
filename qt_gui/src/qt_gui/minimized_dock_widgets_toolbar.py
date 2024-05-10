@@ -28,9 +28,12 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from python_qt_binding.QtCore import QSignalMapper, Qt
+from functools import partial
+
+from python_qt_binding.QtCore import Qt
 from python_qt_binding.QtGui import QIcon
-from python_qt_binding.QtWidgets import QAction, QToolBar, QWidget
+from python_qt_binding.QtGui import QAction
+from python_qt_binding.QtWidgets import QToolBar
 
 
 class MinimizedDockWidgetsToolbar(QToolBar):
@@ -43,8 +46,6 @@ class MinimizedDockWidgetsToolbar(QToolBar):
         self.setObjectName('MinimizedDockWidgetsToolbar')
         self.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         self._container_manager = container_manager
-        self._signal_mapper = QSignalMapper(self)
-        self._signal_mapper.mapped[QWidget].connect(self._on_action_triggered)
         self._dock_widgets = {}
 
         self.hide()
@@ -62,8 +63,7 @@ class MinimizedDockWidgetsToolbar(QToolBar):
         if len(title) > MinimizedDockWidgetsToolbar.max_label_length:
             action.setToolTip(title)
             action.setIconText(title[0:MinimizedDockWidgetsToolbar.max_label_length] + '...')
-        self._signal_mapper.setMapping(action, dock_widget)
-        action.triggered.connect(self._signal_mapper.map)
+        action.triggered.connect(partial(self._on_action_triggered, dock_widget))
         self._dock_widgets[dock_widget] = action
         self.addAction(action)
 
@@ -74,7 +74,6 @@ class MinimizedDockWidgetsToolbar(QToolBar):
             action = self._dock_widgets[dock_widget]
             self.removeAction(action)
             del self._dock_widgets[dock_widget]
-            self._signal_mapper.removeMappings(action)
 
         if not self._dock_widgets:
             self.hide()

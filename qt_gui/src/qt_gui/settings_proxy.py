@@ -28,7 +28,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from python_qt_binding.QtCore import QMutex, QMutexLocker, QObject
+from python_qt_binding.QtCore import QRecursiveMutex, QMutexLocker, QObject
 
 
 class SettingsProxy(QObject):
@@ -39,7 +39,7 @@ class SettingsProxy(QObject):
         self.setObjectName('SettingsProxy')
 
         self._qsettings = qsettings
-        self._mutex = QMutex(QMutex.Recursive)
+        self._mutex = QRecursiveMutex()
 
     def all_keys(self, group):
         locker = QMutexLocker(self._mutex)  # noqa: F841

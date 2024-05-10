@@ -28,8 +28,11 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from python_qt_binding.QtCore import QObject, QSignalMapper, Signal, Slot
-from python_qt_binding.QtWidgets import QAction, QMenu
+from functools import partial
+
+from python_qt_binding.QtCore import QObject, Signal, Slot
+from python_qt_binding.QtGui import QAction
+from python_qt_binding.QtWidgets import QMenu
 
 from qt_gui.icon_loader import get_icon
 from qt_gui.menu_manager import MenuManager
@@ -49,15 +52,11 @@ class PluginMenu(QObject):
         plugin_menu = menu_bar.addMenu(menu_bar.tr('&Plugins'))
         running_menu = menu_bar.addMenu(menu_bar.tr('&Running'))
         self._plugin_menu_manager = MenuManager(plugin_menu)
-        self._plugin_mapper = QSignalMapper(plugin_menu)
-        self._plugin_mapper.mapped[str].connect(self.load_plugin_signal)
         self._running_menu_manager = MenuManager(running_menu)
         action = QAction(
             ' Hidden action to work around QTBUG-52582', self._running_menu_manager.menu)
         action.setVisible(False)
         self._running_menu_manager.add_item(action)
-        self._running_mapper = QSignalMapper(running_menu)
-        self._running_mapper.mapped[str].connect(self.unload_plugin_signal)
 
         self._instances = {}
 
@@ -81,8 +80,7 @@ class PluginMenu(QObject):
         action = QAction(action_attributes['label'], menu_manager.menu)
         self._enrich_action(action, action_attributes, base_path)
 
-        self._plugin_mapper.setMapping(action, plugin_descriptor.plugin_id())
-        action.triggered.connect(self._plugin_mapper.map)
+        action.triggered.connect(partial(self.load_plugin_signal.emit, plugin_descriptor.plugin_id()))
 
         not_available = plugin_descriptor.attributes().get('not_available')
         if not_available:
@@ -96,8 +94,7 @@ class PluginMenu(QObject):
         action_attributes = plugin_descriptor.action_attributes()
         action = QAction(action_attributes['label'], self._plugin_menu_manager.menu)
         self._enrich_action(action, action_attributes)
-        self._plugin_mapper.setMapping(action, plugin_descriptor.plugin_id())
-        action.triggered.connect(self._plugin_mapper.map)
+        action.triggered.connect(partial(self.load_plugin_signal.emit, plugin_descriptor.plugin_id()))
         self._plugin_menu_manager.add_prefix(action)
 
     def add_instance(self, plugin_descriptor, instance_id):
@@ -107,15 +104,13 @@ class PluginMenu(QObject):
         base_path = plugin_descriptor.attributes().get('plugin_path')
         self._enrich_action(action, action_attributes, base_path)
 
-        self._running_mapper.setMapping(action, str(instance_id))
-        action.triggered.connect(self._running_mapper.map)
+        action.triggered.connect(partial(self.unload_plugin_signal.emit, str(instance_id)))
 
         self._running_menu_manager.add_item(action)
         self._instances[instance_id] = action
 
     def remove_instance(self, instance_id):
         action = self._instances[instance_id]
-        self._running_mapper.removeMappings(action)
         self._running_menu_manager.remove_item(action)
 
     @Slot(str, str)

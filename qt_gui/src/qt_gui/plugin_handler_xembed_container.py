@@ -30,10 +30,12 @@
 
 import sys
 
+from functools import partial
+
 from dbus.server import Server
 from python_qt_binding import QT_BINDING
 from python_qt_binding.QtCore import (QByteArray, QDataStream, qDebug, QIODevice,
-                                      QProcess, QSignalMapper, Qt, qWarning)
+                                      QProcess, Qt, qWarning)
 from python_qt_binding.QtGui import QIcon, QToolBar, QX11EmbedContainer
 
 from qt_gui.main import Main
@@ -70,8 +72,6 @@ class PluginHandlerXEmbedContainer(PluginHandler):
         self._embed_containers = {}
         # mapping of toolbar object name to the toolbar
         self._embed_toolbars = {}
-        self._signal_mapper_toolbars = QSignalMapper(self)
-        self._signal_mapper_toolbars.mapped[str].connect(self._on_toolbar_orientation_changed)
 
     def _load(self):
         if not Main.main_filename:
@@ -236,8 +236,7 @@ class PluginHandlerXEmbedContainer(PluginHandler):
         self._embed_containers[toolbar_object_name] = embed_container
         # setup mapping to signal change of orientation to client
         self._embed_toolbars[toolbar_object_name] = toolbar
-        self._signal_mapper_toolbars.setMapping(toolbar, toolbar_object_name)
-        toolbar.orientationChanged.connect(self._signal_mapper_toolbars.map)
+        toolbar.orientationChanged.connect(partial(self._on_toolbar_orientation_changed, toolbar_object_name))
         return embed_container.winId()
 
     def _on_toolbar_orientation_changed(self, toolbar_object_name):

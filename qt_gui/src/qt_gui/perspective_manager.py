@@ -31,10 +31,13 @@
 import json
 import os
 
+from functools import partial
+
 from python_qt_binding import loadUi
-from python_qt_binding.QtCore import QByteArray, qDebug, QObject, QSignalMapper, Signal, Slot
+from python_qt_binding.QtCore import QByteArray, qDebug, QObject, Signal, Slot
 from python_qt_binding.QtGui import QIcon, QValidator
-from python_qt_binding.QtWidgets import QAction, QFileDialog, QInputDialog, QMessageBox
+from python_qt_binding.QtGui import QAction
+from python_qt_binding.QtWidgets import QFileDialog, QInputDialog, QMessageBox
 
 from qt_gui.menu_manager import MenuManager
 from qt_gui.settings import Settings
@@ -71,7 +74,6 @@ class PerspectiveManager(QObject):
         self._create_perspective_dialog = None
 
         self._menu_manager = None
-        self._perspective_mapper = None
 
         # get perspective list from settings
         self.perspectives = self._settings_proxy.value('', 'perspectives', [])
@@ -92,8 +94,6 @@ class PerspectiveManager(QObject):
 
     def set_menu(self, menu):
         self._menu_manager = MenuManager(menu)
-        self._perspective_mapper = QSignalMapper(menu)
-        self._perspective_mapper.mapped[str].connect(self.switch_perspective)
 
         # generate menu
         create_action = QAction('&Create perspective...', self._menu_manager.menu)
@@ -230,7 +230,7 @@ class PerspectiveManager(QObject):
 
         # show dialog and wait for it's return value
         return_value = self._create_perspective_dialog.exec_()
-        if return_value == self._create_perspective_dialog.Rejected:
+        if return_value == self._create_perspective_dialog.rejected():
             return
 
         name = str(self._create_perspective_dialog.perspective_name_edit.text()).lstrip(
@@ -287,8 +287,7 @@ class PerspectiveManager(QObject):
             # create action
             action = QAction(name, self._menu_manager.menu)
             action.setCheckable(True)
-            self._perspective_mapper.setMapping(action, name)
-            action.triggered.connect(self._perspective_mapper.map)
+            action.triggered.connect(partial(self.switch_perspective, name))
 
             # add action to menu
             self._menu_manager.add_item(action)

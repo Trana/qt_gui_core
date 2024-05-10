@@ -418,11 +418,10 @@ class Main(object):
         from python_qt_binding import QT_BINDING
 
         from python_qt_binding.QtCore import (qDebug, qInstallMessageHandler,
-                                              QSettings, Qt, QtCriticalMsg, QtDebugMsg)
-        from python_qt_binding.QtCore import QtFatalMsg, QTimer, QtWarningMsg
-
+                                              QSettings, Qt, QtMsgType)
+        from python_qt_binding.QtCore import QTimer
         from python_qt_binding.QtGui import QIcon
-        from python_qt_binding.QtWidgets import QAction
+        from python_qt_binding.QtGui import QAction
 
         from qt_gui.about_handler import AboutHandler
         from qt_gui.composite_plugin_provider import CompositePluginProvider
@@ -441,13 +440,13 @@ class Main(object):
                 cyan_color = '\033[36m' if colored_output else ''
                 red_color = '\033[31m' if colored_output else ''
                 reset_color = '\033[0m' if colored_output else ''
-                if type_ == QtDebugMsg and self._options.verbose:
+                if type_ == QtMsgType.QtDebugMsg and self._options.verbose:
                     print(msg, file=sys.stderr)
-                elif type_ == QtWarningMsg:
+                elif type_ == QtMsgType.QtWarningMsg:
                     print(cyan_color + msg + reset_color, file=sys.stderr)
-                elif type_ == QtCriticalMsg:
+                elif type_ == QtMsgType.QtCriticalMsg:
                     print(red_color + msg + reset_color, file=sys.stderr)
-                elif type_ == QtFatalMsg:
+                elif type_ == QtMsgType.QtFatalMsg:
                     print(red_color + msg + reset_color, file=sys.stderr)
                     sys.exit(1)
             qInstallMessageHandler(message_handler)

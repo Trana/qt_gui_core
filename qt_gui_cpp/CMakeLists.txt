@@ -31,7 +31,7 @@ set(PYTHON_LIBRARY ${Python3_LIBRARY_DIRS})
 set(PYTHON_INCLUDE_DIR ${Python3_INCLUDE_DIRS})
 
 find_package(pluginlib REQUIRED)
-find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 find_package(tinyxml2_vendor REQUIRED)
 find_package(TinyXML2 REQUIRED)
 
@@ -55,7 +55,7 @@ set(qt_gui_cpp_HDRS
   include/qt_gui_cpp/plugin_context.h
 )
 
-qt5_wrap_cpp(qt_gui_cpp_MOCS ${qt_gui_cpp_HDRS})
+qt6_wrap_cpp(qt_gui_cpp_MOCS ${qt_gui_cpp_HDRS})
 
 add_library(${PROJECT_NAME} SHARED ${qt_gui_cpp_SRCS} ${qt_gui_cpp_MOCS})
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -65,12 +65,14 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME}
   ${QT_QTCORE_LIBRARY}
   ${QT_QTGUI_LIBRARY}
-  Qt5::Widgets
+  Qt6::Widgets
   pluginlib::pluginlib
   tinyxml2::tinyxml2)
 
 add_subdirectory(src/qt_gui_cpp_shiboken)
-add_subdirectory(src/qt_gui_cpp_sip)
+if (NOT APPLE)
+  add_subdirectory(src/qt_gui_cpp_sip)
+endif()
 
 message(STATUS "Python binding generators: ${qt_gui_cpp_BINDINGS}")
 if(NOT qt_gui_cpp_BINDINGS)

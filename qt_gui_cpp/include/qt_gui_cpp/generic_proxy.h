@@ -35,6 +35,25 @@
 
 #include <QObject>
 
+
+// Qt5
+// https://github.com/qt/qtbase/blob/5.15/src/corelib/kernel/qobjectdefs.h
+//
+// QArgument
+// QReturnArgument
+//
+#define Q5_ARG(type, data) QArgument<type >(#type, data)
+#define Q5_RETURN_ARG(type, data) QReturnArgument<type >(#type, data)
+
+// Qt6
+// https://github.com/qt/qtbase/blob/6.7/src/corelib/kernel/qobjectdefs.h
+//
+// QMetaMethodArgument
+// QMetaMethodReturnArgument
+//
+#define Q6_ARG(Type, data)           QtPrivate::Invoke::argument<Type>(QT_STRINGIFY(Type), data)
+#define Q6_RETURN_ARG(Type, data)    QtPrivate::Invoke::returnArgument<Type>(QT_STRINGIFY(Type), data)
+
 namespace qt_gui_cpp
 {
 

@@ -1,4 +1,4 @@
-find_package(Qt5Widgets REQUIRED)
+find_package(Qt6Widgets REQUIRED)
 set(qt_gui_cpp_shiboken_QT_COMPONENTS
   QtCore
   QtGui
@@ -53,13 +53,13 @@ if(shiboken_helper_FOUND)
     if (APPLE)
       # The shiboken_generator fails without these includes.
       # TODO: resolve why these cannot be set using the component variables
-      #       Qt5Core_INCLUDE_DIRS etc.
-      list(APPEND qt_gui_cpp_INCLUDE_PATH "${Qt5_DIR}/../../../include")
-      list(APPEND qt_gui_cpp_INCLUDE_PATH "${Qt5_DIR}/../../../include/QtCore")
-      list(APPEND qt_gui_cpp_INCLUDE_PATH "${Qt5_DIR}/../../../include/QtWidgets")
+      #       Qt6Core_INCLUDE_DIRS etc.
+      list(APPEND qt_gui_cpp_INCLUDE_PATH "${Qt6_DIR}/../../../include")
+      list(APPEND qt_gui_cpp_INCLUDE_PATH "${Qt6_DIR}/../../../include/QtCore")
+      list(APPEND qt_gui_cpp_INCLUDE_PATH "${Qt6_DIR}/../../../include/QtWidgets")
     endif()
 
-    set(QT_INCLUDE_DIR "${Qt5Widgets_INCLUDE_DIRS}")
+    set(QT_INCLUDE_DIR "${Qt6Widgets_INCLUDE_DIRS}")
     shiboken_generator(libqt_gui_cpp global.h typesystem.xml ${PROJECT_SOURCE_DIR}/src/qt_gui_cpp_shiboken "${qt_gui_cpp_shiboken_SRCS}" "${qt_gui_cpp_HDRS}" "${qt_gui_cpp_INCLUDE_PATH}" "${CMAKE_CURRENT_BINARY_DIR}")
 
     shiboken_include_directories(qt_gui_cpp_shiboken "${qt_gui_cpp_shiboken_QT_COMPONENTS}")

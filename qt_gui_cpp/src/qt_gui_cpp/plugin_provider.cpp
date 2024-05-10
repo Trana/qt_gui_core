@@ -42,15 +42,23 @@ PluginProvider::~PluginProvider()
 
 QMap<QString, QString> PluginProvider::discover(QObject* discovery_data)
 {
-  QMultiMap<QString, QString> plugins;
+  QMultiMap<QString, QString> mm_plugins;
   QList<PluginDescriptor*> descriptors = discover_descriptors(discovery_data);
   for (QList<PluginDescriptor*>::iterator it = descriptors.begin(); it != descriptors.end(); it++)
   {
     // extract plugin descriptor dictionary
     PluginDescriptor* descriptor = *it;
     QMap<QString, QString> plugin = descriptor->toDictionary();
-    plugins.unite(plugin);
+    QMultiMap<QString, QString> mm_plugin(plugin);
+    mm_plugins.unite(mm_plugin);
     delete descriptor;
+  }
+
+  // copy contents
+  QMap<QString, QString> plugins;
+  for (QMultiMap<QString, QString>::iterator it = mm_plugins.begin(); it != mm_plugins.end(); it++)
+  {
+    plugins.insert(it.key(), it.value());
   }
   return plugins;
 }

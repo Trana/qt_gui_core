@@ -159,7 +159,7 @@ class MainWindow(DockableMainWindow):
                 if not toolbar.objectName():
                     continue
                 area = Qt.ToolBarArea(
-                    int(toolbar_settings.value(toolbar.objectName(), Qt.NoToolBarArea)))
+                    toolbar_settings.value(toolbar.objectName(), Qt.NoToolBarArea))
                 if area in [Qt.LeftToolBarArea,
                             Qt.RightToolBarArea,
                             Qt.TopToolBarArea,
